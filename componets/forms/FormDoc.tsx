@@ -8,7 +8,7 @@ import Image from "next/image";
 const FormEvent = () => {
   
   const [param_temperature, setParam_Temperature] = useState(0.5);
-  const [param_n, setParam_N] = useState(4);
+  const [param_n, setParam_N] = useState(5);
   const [param_model, setParam_Model] = useState("text-davinci-003");
   
   // const handleSubmit = (event: React.ChangeEvent<HTMLInputElement>) => {
