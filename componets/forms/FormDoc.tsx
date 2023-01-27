@@ -3,13 +3,19 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Configuration, OpenAIApi } from "openai";
-
+import Image from "next/image";
 
 const FormEvent = () => {
-    // const handleSubmit = (event: React.ChangeEvent<HTMLInputElement>) => {
+  
+  const [param_temperature, setParam_Temperature] = useState(0.5);
+  const [param_n, setParam_N] = useState(4);
+  const [param_model, setParam_Model] = useState("text-davinci-003");
+  
+  // const handleSubmit = (event: React.ChangeEvent<HTMLInputElement>) => {
     const handleSubmit = (event: any) => {
         event.preventDefault();
-        console.log("espere...");
+
+
         getRes();
         // getRes2();
     };
@@ -22,16 +28,16 @@ const FormEvent = () => {
         // prompt: "Quien es el presidente de eeuu?",
         // prompt: "Que es una criptomoneda y devuelve la lista de las 10 mejores criptomonedas?",
         // prompt: "What is the impact of creatine on cognition?",
-        temperature: 0.9,
-        n: 5,
-        model: "text-davinci-003"
+        temperature: param_temperature,
+        n: param_n,
+        model: param_model
     });
 
 
     const getRes2 = async () => {
         const configuration = new Configuration({
             organization: "org-1wyY4xOolGB2b9BoZy5M3pe1",
-            apiKey: "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",
+            apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY,
         });
         const openai = new OpenAIApi(configuration);
         const response = await openai.listEngines();
@@ -41,6 +47,7 @@ const FormEvent = () => {
   const getRes = () => {
 
     setLoading(true);
+
     axios({
       method: "POST",
       url: "https://api.openai.com/v1/completions",
@@ -48,11 +55,11 @@ const FormEvent = () => {
       headers: {
         "Content-Type": "application/json",
         Authorization:
-          "Bearer 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"
+          "Bearer " + process.env.NEXT_PUBLIC_OPENAI_KEY
       }
     })
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         responseHandler(res);
       })
       .catch((e) => {
@@ -72,6 +79,10 @@ const FormEvent = () => {
         <form >
         <input type="text" placeholder="Pregunte? (5 rpta)"
          onChange={(e) => {
+            // setParam_Temperature( Number(process.env.NEXT_PUBLIC_OPENAI_TEMPERATURE || 0.5) );
+            // setParam_N( Number(process.env.NEXT_PUBLIC_OPENAI_N || 4) );
+            // setParam_Model( (process.env.NEXT_PUBLIC_OPENAI_MODEL || "text-davinci-003") );
+          
             setPayLoad({
               ...payload,
               prompt: e.target.value
@@ -82,7 +93,13 @@ const FormEvent = () => {
         {/* serarch field */}
 
         <button onClick={handleSubmit} >
-            <img src="images/icon/54.svg" alt="icon" />
+            <Image 
+              src="images/icon/54.svg" 
+              alt="icon"
+              width={27}
+              height={23}
+              priority
+            />
         </button>
         {/* Search button */}
 
