@@ -1,20 +1,29 @@
 "use client"; // this is a client component
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import axios from "axios";
 import { Configuration, OpenAIApi } from "openai";
 import Image from "next/image";
+import OpenAI from "openai-api";
+
+const openai = new OpenAI(process.env.OPENAI_API || "");
 
 const FormEvent = () => {
   
-  const [param_temperature, setParam_Temperature] = useState(0.5);
-  const [param_n, setParam_N] = useState(5);
+  const [param_temperature, setParam_Temperature] = useState(0.9);
+  const [param_n, setParam_N] = useState(10);
+  // const [param_model, setParam_Model] = useState("code-davinci-002");
   const [param_model, setParam_Model] = useState("text-davinci-003");
   
   // const handleSubmit = (event: React.ChangeEvent<HTMLInputElement>) => {
+ 
+    const inputRef = useRef();
+
+    let input = "quien es messi?";
     const handleSubmit = (event: any) => {
         event.preventDefault();
 
+        // input = inputRef.current.value;
 
         getRes();
         // getRes2();
@@ -23,16 +32,29 @@ const FormEvent = () => {
     const [loading, setLoading] = useState(false);
     let [obj, setObj] = useState({ choices: [] });
     const [payload, setPayLoad] = useState({
-        prompt: "",
-        // prompt: "pregunte?",
-        // prompt: "Quien es el presidente de eeuu?",
-        // prompt: "Que es una criptomoneda y devuelve la lista de las 10 mejores criptomonedas?",
+        prompt: "slogan para una empresa de software",
         // prompt: "What is the impact of creatine on cognition?",
         temperature: param_temperature,
-        n: param_n,
-        model: param_model
+        n: param_n
+        , model: param_model
+        , max_tokens: 1000
+        // , stop: ['AI:', `Human:`],
     });
 
+    const getRes3 = async () => {
+      const res = await openai.complete({
+        engine: "davinci",
+        prompt: input,
+        maxTokens: 50,
+        temperature: 0.7,
+        topP: 1,
+        presencePenalty: 0,
+        frequencyPenalty: 0,
+        bestOf: 1
+      });
+
+      console.log(res);
+    };
 
     const getRes2 = async () => {
         const configuration = new Configuration({
@@ -40,8 +62,21 @@ const FormEvent = () => {
             apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY,
         });
         const openai = new OpenAIApi(configuration);
-        const response = await openai.listEngines();
+        // const response = await openai.listEngines();
+
+
+        const response = await openai.createCompletion({
+          model: "text-davinci-003",
+          prompt: `Quien es messi?`,
+          max_tokens: 1000,
+          temperature: 0.5
+        });
+        //console.log(response.data.choices[0].text);
+        // questionData = response.;
+        var questionString = response.data.choices[0].text;
+    
         console.log("response", response);
+        console.log("questionString", questionString);
   };
     
   const getRes = () => {
@@ -51,6 +86,7 @@ const FormEvent = () => {
     axios({
       method: "POST",
       url: "https://api.openai.com/v1/completions",
+      // url: "https://api.openai.com/v1/engines/davinci/completions",
       data: payload,
       headers: {
         "Content-Type": "application/json",
@@ -59,7 +95,7 @@ const FormEvent = () => {
       }
     })
       .then((res) => {
-        // console.log(res);
+        console.log(res);
         responseHandler(res);
       })
       .catch((e) => {
@@ -77,7 +113,7 @@ const FormEvent = () => {
 
     return (
         <form >
-        <input type="text" placeholder="Pregunte? (5 rpta)"
+        <input type="text" placeholder="pregunte? (10 rpta)"
          onChange={(e) => {
             // setParam_Temperature( Number(process.env.NEXT_PUBLIC_OPENAI_TEMPERATURE || 0.5) );
             // setParam_N( Number(process.env.NEXT_PUBLIC_OPENAI_N || 4) );
@@ -114,7 +150,7 @@ const FormEvent = () => {
               {loading ? (
                 <span>cargando...</span>
               ) : (
-                obj?.choices?.map((v:any, i) => <div>{v.text}</div>)
+                obj?.choices?.map((v:any, i) => <div className="form-control"><li> {v.text}</li></div>)
               )}
             </p>
 
