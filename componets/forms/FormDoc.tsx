@@ -10,7 +10,7 @@ const openai = new OpenAI(process.env.OPENAI_API || "");
 
 const FormEvent = () => {
   
-  const [param_temperature, setParam_Temperature] = useState(0.9);
+  const [param_temperature, setParam_Temperature] = useState(0.5);
   const [param_n, setParam_N] = useState(10);
   // const [param_model, setParam_Model] = useState("code-davinci-002");
   const [param_model, setParam_Model] = useState("text-davinci-003");
@@ -38,6 +38,7 @@ const FormEvent = () => {
         n: param_n
         , model: param_model
         , max_tokens: 1000
+        // , stop: "."
         // , stop: ['AI:', `Human:`],
     });
 
